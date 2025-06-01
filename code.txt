@@ -35,8 +35,8 @@ git init
 git add .
 git commit -m "Primer commit"
 ✅ Paso 5: Conecta tu repositorio local con el repositorio remoto de GitHub
-Copia la URL del repositorio que creaste (por ejemplo: https://github.com/usuario/mi-proyecto.git).
-git remote add origin https://github.com/usuario/mi-proyecto.git
+Copia la URL del repositorio que creaste (por ejemplo: https://github.com/maxespi/elmantenido-backend.git).
+git remote add origin https://github.com/maxespi/elmantenido-backend.git
 ✅ Paso 6: Sube tu código al repositorio
 git branch -M main
 git push -u origin main
