@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>👥 Gestión de Usuarios</h1>
+        <nav>
+          <a href="/admin">← Dashboard</a>
+          <a href="/admin/tables">Tablas</a>
+          <a href="/admin/table/usuarios/create" class="btn btn-success"
+            >+ Nuevo Usuario</a
+          >
+        </nav>
+      </header>
+
+      <main>
+        <!-- Búsqueda de usuarios -->
+        <div class="search-section">
+          <div class="search-container">
+            <input
+              type="text"
+              id="userSearch"
+              placeholder="🔍 Buscar usuario por nombre, email o RUT..."
+              class="search-input"
+            />
+            <div id="userSearchResults" class="search-results"></div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <div class="table-header">
+            <h2>👤 Lista de Usuarios</h2>
+            <span class="record-count"><%= usuarios.length %> usuarios</span>
+          </div>
+
+          <% if (usuarios.length > 0) { %>
+          <div class="users-grid">
+            <% usuarios.forEach(usuario => { %>
+            <div class="user-card">
+              <div class="user-avatar">
+                <span class="avatar-initials">
+                  <%= usuario.nombre.charAt(0) %><%= usuario.apellido.charAt(0)
+                  %>
+                </span>
+              </div>
+
+              <div class="user-info">
+                <h3 class="user-name">
+                  <%= usuario.nombre %> <%= usuario.apellido %>
+                </h3>
+                <p class="user-email">📧 <%= usuario.email %></p>
+                <p class="user-rut">🆔 <%= usuario.rut %></p>
+                <% if (usuario.telefono) { %>
+                <p class="user-phone">📱 <%= usuario.telefono %></p>
+                <% } %>
+
+                <div class="user-stats">
+                  <span class="stat-badge">
+                    🔗 <%= usuario.total_relaciones || 0 %> relaciones
+                  </span>
+                  <span class="stat-date">
+                    📅 Desde <%= new
+                    Date(usuario.created_at).toLocaleDateString('es-CL') %>
+                  </span>
+                </div>
+              </div>
+
+              <div class="user-actions">
+                <a
+                  href="/admin/user/<%= usuario.id %>/details"
+                  class="btn btn-primary"
+                  title="Ver detalles"
+                >
+                  👁️ Ver Detalles
+                </a>
+                <a
+                  href="/admin/table/usuarios/edit/<%= usuario.id %>"
+                  class="btn btn-warning btn-sm"
+                  title="Editar"
+                >
+                  ✏️
+                </a>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+
+          <!-- Paginación -->
+          <% if (pagination.totalPages > 1) { %>
+          <div class="pagination">
+            <% if (pagination.hasPrev) { %>
+            <a href="?page=<%= pagination.currentPage - 1 %>"
+              >&larr; Anterior</a
+            >
+            <% } %> <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+            <a
+              href="?page=<%= i %>"
+              class="<%= pagination.currentPage === i ? 'active' : '' %>"
+            >
+              <%= i %>
+            </a>
+            <% } %> <% if (pagination.hasNext) { %>
+            <a href="?page=<%= pagination.currentPage + 1 %>"
+              >Siguiente &rarr;</a
+            >
+            <% } %>
+          </div>
+          <% } %> <% } else { %>
+          <div class="empty-state">
+            <div class="empty-icon">👤</div>
+            <h3>No hay usuarios registrados</h3>
+            <p>Crea el primer usuario para comenzar.</p>
+            <a href="/admin/table/usuarios/create" class="btn btn-success"
+              >Crear Primer Usuario</a
+            >
+          </div>
+          <% } %>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Búsqueda de usuarios en tiempo real
+      const userSearch = document.getElementById("userSearch");
+      const userSearchResults = document.getElementById("userSearchResults");
+
+      userSearch.addEventListener("input", async (e) => {
+        const query = e.target.value.trim();
+        if (query.length < 2) {
+          userSearchResults.innerHTML = "";
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/admin/api/users/search?q=${encodeURIComponent(query)}`
+          );
+          const results = await response.json();
+
+          if (results.length > 0) {
+            userSearchResults.innerHTML = results
+              .map(
+                (user) => `
+                        <div class="search-item">
+                            <a href="/admin/user/${user.id}/details">
+                                <strong>${user.nombre} ${user.apellido}</strong><br>
+                                <small>📧 ${user.email} • 🆔 ${user.rut}</small>
+                            </a>
+                        </div>
+                    `
+              )
+              .join("");
+          } else {
+            userSearchResults.innerHTML =
+              '<div class="search-item">No se encontraron usuarios</div>';
+          }
+        } catch (error) {
+          console.error("Error en búsqueda:", error);
+        }
+      });
+
+      // Cerrar resultados al hacer clic fuera
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-section")) {
+          userSearchResults.innerHTML = "";
+        }
+      });
+    </script>
+
+    <style>
+      .search-section {
+        margin-bottom: 30px;
+      }
+
+      .search-container {
+        position: relative;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .user-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .user-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .user-avatar {
+        align-self: flex-start;
+      }
+
+      .avatar-initials {
+        display: inline-flex;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .user-info {
+        flex: 1;
+      }
+
+      .user-name {
+        margin: 0 0 10px 0;
+        color: #4a5568;
+        font-size: 1.3rem;
+      }
+
+      .user-email,
+      .user-rut,
+      .user-phone {
+        margin: 5px 0;
+        color: #718096;
+        font-size: 0.9rem;
+      }
+
+      .user-stats {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .stat-badge {
+        background: #e2e8f0;
+        color: #4a5568;
+        padding: 4px 8px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .stat-date {
+        color: #718096;
+        font-size: 0.8rem;
+      }
+
+      .user-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn-primary {
+        background: #667eea;
+        color: white;
+        flex: 1;
+        min-width: 120px;
+      }
+
+      .btn-primary:hover {
+        background: #5a67d8;
+      }
+
+      @media (max-width: 768px) {
+        .users-grid {
+          grid-template-columns: 1fr;
+          padding: 10px;
+        }
+
+        .user-card {
+          padding: 15px;
+        }
+
+        .user-actions {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </body>
+</html>

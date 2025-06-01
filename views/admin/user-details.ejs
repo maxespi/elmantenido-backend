@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>👤 <%= usuario.nombre %> <%= usuario.apellido %></h1>
+        <nav>
+          <a href="/admin">Dashboard</a>
+          <a href="/admin/users">← Lista de Usuarios</a>
+          <a
+            href="/admin/table/usuarios/edit/<%= usuario.id %>"
+            class="btn btn-warning"
+            >✏️ Editar</a
+          >
+        </nav>
+      </header>
+
+      <main>
+        <!-- Información del Usuario -->
+        <div class="user-profile">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <span class="avatar-large">
+                <%= usuario.nombre.charAt(0) %><%= usuario.apellido.charAt(0) %>
+              </span>
+            </div>
+            <div class="profile-info">
+              <h2><%= usuario.nombre %> <%= usuario.apellido %></h2>
+              <p class="profile-detail">📧 <%= usuario.email %></p>
+              <p class="profile-detail">🆔 <%= usuario.rut %></p>
+              <% if (usuario.telefono) { %>
+              <p class="profile-detail">📱 <%= usuario.telefono %></p>
+              <% } %>
+              <p class="profile-detail">
+                📅 Miembro desde <%= new
+                Date(usuario.created_at).toLocaleDateString('es-CL') %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Estadísticas -->
+          <div class="stats-section">
+            <h3>📊 Estadísticas de Actividad</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-number"><%= stats.totalEgresos %></div>
+                <div class="stat-label">Total Relaciones</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number"><%= stats.comoPagador %></div>
+                <div class="stat-label">Como Pagador</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number"><%= stats.comoDeudor %></div>
+                <div class="stat-label">Como Deudor</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">
+                  $<%= new
+                  Intl.NumberFormat('es-CL').format(stats.montoTotalPagado) %>
+                </div>
+                <div class="stat-label">Total Pagado</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">
+                  $<%= new
+                  Intl.NumberFormat('es-CL').format(stats.montoTotalDeuda) %>
+                </div>
+                <div class="stat-label">Total en Deudas</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number stat-pending">
+                  <%= stats.deudasPendientes %>
+                </div>
+                <div class="stat-label">Deudas Pendientes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección Como Pagador -->
+        <div class="section-container">
+          <h3>💰 Como Pagador (<%= comoPagedador.length %>)</h3>
+          <% if (comoPagedador.length > 0) { %>
+          <div class="relations-grid">
+            <% comoPagedador.forEach(function(relacion) { %>
+            <div class="relation-card pagador">
+              <div class="relation-header">
+                <h4><%= relacion.egreso.nombre %></h4>
+                <span class="role-badge pagador">PAGADOR</span>
+              </div>
+
+              <div class="relation-details">
+                <p>
+                  <strong>📅 Fecha:</strong> <%= new
+                  Date(relacion.egreso.fecha).toLocaleDateString('es-CL') %>
+                </p>
+                <p>
+                  <strong>🏷️ Categoría:</strong> <%= relacion.egreso.categoria
+                  %>
+                </p>
+                <p>
+                  <strong>💰 Monto Total:</strong> $<%= new
+                  Intl.NumberFormat('es-CL').format(relacion.egreso.monto_total)
+                  %>
+                </p>
+                <p>
+                  <strong>💳 Pagó:</strong> $<%= new
+                  Intl.NumberFormat('es-CL').format(relacion.monto_pagado) %>
+                </p>
+                <p>
+                  <strong>🔄 Forma:</strong> <%=
+                  relacion.forma_pago.replace('_', ' ') %>
+                </p>
+                <% if (relacion.entidad_pago) { %>
+                <p><strong>🏦 Entidad:</strong> <%= relacion.entidad_pago %></p>
+                <% } %> <% if (relacion.fecha_pago) { %>
+                <p>
+                  <strong>📅 Fecha Pago:</strong> <%= new
+                  Date(relacion.fecha_pago).toLocaleDateString('es-CL') %>
+                </p>
+                <% } %>
+              </div>
+
+              <% if (relacion.egreso.observaciones) { %>
+              <div class="relation-notes">
+                <p>
+                  <strong>📝 Observaciones:</strong> <%=
+                  relacion.egreso.observaciones %>
+                </p>
+              </div>
+              <% } %>
+
+              <div class="relation-actions">
+                <a
+                  href="/admin/table/egresos/edit/<%= relacion.egreso.id %>"
+                  class="btn btn-sm btn-warning"
+                >
+                  ✏️ Editar Egreso
+                </a>
+                <a
+                  href="/admin/table/usuario_egresos/edit/<%= relacion.id %>"
+                  class="btn btn-sm btn-primary"
+                >
+                  🔗 Editar Relación
+                </a>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+          <% } else { %>
+          <div class="empty-section">
+            <p>Este usuario no ha pagado ningún egreso aún.</p>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Sección Como Deudor -->
+        <div class="section-container">
+          <h3>💳 Como Deudor (<%= comoDeudor.length %>)</h3>
+          <% if (comoDeudor.length > 0) { %>
+          <div class="relations-grid">
+            <% comoDeudor.forEach(function(relacion) { %>
+            <div class="relation-card deudor">
+              <div class="relation-header">
+                <h4><%= relacion.egreso.nombre %></h4>
+                <span class="role-badge deudor">DEUDOR</span>
+                <% if (relacion.estado_pago === 'pagado') { %>
+                <span class="status-badge pagado">✅ PAGADO</span>
+                <% } else { %>
+                <span class="status-badge pendiente">⏳ PENDIENTE</span>
+                <% } %>
+              </div>
+
+              <div class="relation-details">
+                <p>
+                  <strong>📅 Fecha:</strong> <%= new
+                  Date(relacion.egreso.fecha).toLocaleDateString('es-CL') %>
+                </p>
+                <p>
+                  <strong>🏷️ Categoría:</strong> <%= relacion.egreso.categoria
+                  %>
+                </p>
+                <p>
+                  <strong>💰 Monto Total:</strong> $<%= new
+                  Intl.NumberFormat('es-CL').format(relacion.egreso.monto_total)
+                  %>
+                </p>
+                <p>
+                  <strong>💳 Debe Pagar:</strong> $<%= new
+                  Intl.NumberFormat('es-CL').format(relacion.monto_pagado) %>
+                </p>
+                <p>
+                  <strong>🔄 Forma:</strong> <%=
+                  relacion.forma_pago.replace('_', ' ') %>
+                </p>
+                <% if (relacion.entidad_pago) { %>
+                <p><strong>🏦 Entidad:</strong> <%= relacion.entidad_pago %></p>
+                <% } %> <% if (relacion.fecha_pago) { %>
+                <p>
+                  <strong>📅 Fecha Pago:</strong> <%= new
+                  Date(relacion.fecha_pago).toLocaleDateString('es-CL') %>
+                </p>
+                <% } %>
+              </div>
+
+              <% if (relacion.egreso.observaciones) { %>
+              <div class="relation-notes">
+                <p>
+                  <strong>📝 Observaciones:</strong> <%=
+                  relacion.egreso.observaciones %>
+                </p>
+              </div>
+              <% } %>
+
+              <div class="relation-actions">
+                <a
+                  href="/admin/table/egresos/edit/<%= relacion.egreso.id %>"
+                  class="btn btn-sm btn-warning"
+                >
+                  ✏️ Editar Egreso
+                </a>
+                <a
+                  href="/admin/table/usuario_egresos/edit/<%= relacion.id %>"
+                  class="btn btn-sm btn-primary"
+                >
+                  🔗 Editar Relación
+                </a>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+          <% } else { %>
+          <div class="empty-section">
+            <p>Este usuario no tiene deudas registradas.</p>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Resumen en Tabla -->
+        <div class="section-container">
+          <h3>📋 Resumen de Todas las Relaciones</h3>
+          <% if (relaciones.length > 0) { %>
+          <div class="table-responsive">
+            <table class="relations-table">
+              <thead>
+                <tr>
+                  <th>Egreso</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Monto</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% relaciones.forEach(function(relacion) { %>
+                <tr>
+                  <td>
+                    <strong><%= relacion.egreso.nombre %></strong><br />
+                    <small><%= relacion.egreso.categoria %></small>
+                  </td>
+                  <td>
+                    <% if (relacion.rol === 'pagador') { %>
+                    <span class="role-badge pagador">PAGADOR</span>
+                    <% } else { %>
+                    <span class="role-badge deudor">DEUDOR</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (relacion.estado_pago === 'pagado') { %>
+                    <span class="status-badge pagado">✅ PAGADO</span>
+                    <% } else { %>
+                    <span class="status-badge pendiente">⏳ PENDIENTE</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    $<%= new
+                    Intl.NumberFormat('es-CL').format(relacion.monto_pagado) %>
+                  </td>
+                  <td>
+                    <%= new
+                    Date(relacion.egreso.fecha).toLocaleDateString('es-CL') %>
+                  </td>
+                  <td class="actions-cell">
+                    <a
+                      href="/admin/table/usuario_egresos/edit/<%= relacion.id %>"
+                      class="btn btn-sm btn-primary"
+                      title="Editar"
+                      >✏️</a
+                    >
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <% } else { %>
+          <div class="empty-section">
+            <p>Este usuario no tiene relaciones con egresos registradas.</p>
+          </div>
+          <% } %>
+        </div>
+      </main>
+    </div>
+
+    <style>
+      .user-profile {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .profile-header {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        margin-bottom: 30px;
+      }
+
+      .profile-avatar {
+        flex-shrink: 0;
+      }
+
+      .avatar-large {
+        display: inline-flex;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-weight: bold;
+        font-size: 2rem;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .profile-info h2 {
+        margin: 0 0 15px 0;
+        color: #4a5568;
+        font-size: 2rem;
+      }
+
+      .profile-detail {
+        margin: 8px 0;
+        color: #718096;
+        font-size: 1rem;
+      }
+
+      .stats-section h3 {
+        margin-bottom: 20px;
+        color: #4a5568;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 20px;
+        background: #f7fafc;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #4a5568;
+        margin-bottom: 5px;
+      }
+
+      .stat-number.stat-pending {
+        color: #ed8936;
+      }
+
+      .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+      }
+
+      .section-container {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .section-container h3 {
+        margin-bottom: 25px;
+        color: #4a5568;
+      }
+
+      .relations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 20px;
+      }
+
+      .relation-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 20px;
+        background: white;
+        transition: all 0.3s;
+      }
+
+      .relation-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .relation-card.pagador {
+        border-left: 4px solid #48bb78;
+      }
+
+      .relation-card.deudor {
+        border-left: 4px solid #ed8936;
+      }
+
+      .relation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .relation-header h4 {
+        margin: 0;
+        color: #4a5568;
+        font-size: 1.2rem;
+      }
+
+      .role-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+      }
+
+      .role-badge.pagador {
+        background: #48bb78;
+      }
+
+      .role-badge.deudor {
+        background: #ed8936;
+      }
+
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+      }
+
+      .status-badge.pagado {
+        background: #48bb78;
+      }
+
+      .status-badge.pendiente {
+        background: #ed8936;
+      }
+
+      .relation-details {
+        margin-bottom: 15px;
+      }
+
+      .relation-details p {
+        margin: 8px 0;
+        color: #718096;
+        font-size: 0.9rem;
+      }
+
+      .relation-notes {
+        background: #f7fafc;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+      }
+
+      .relation-notes p {
+        margin: 0;
+        color: #4a5568;
+        font-size: 0.9rem;
+      }
+
+      .relation-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .relations-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .relations-table th,
+      .relations-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .relations-table th {
+        background: #f7fafc;
+        font-weight: 600;
+        color: #4a5568;
+      }
+
+      .relations-table tr:hover {
+        background: #f7fafc;
+      }
+
+      .empty-section {
+        text-align: center;
+        padding: 60px 20px;
+        color: #718096;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .profile-header {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .relations-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .relation-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .relation-actions {
+          flex-direction: column;
+        }
+
+        .relation-actions .btn {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section-container {
+          padding: 20px 15px;
+        }
+
+        .relation-card {
+          padding: 15px;
+        }
+      }
+    </style>
+  </body>
+</html>

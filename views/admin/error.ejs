@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error - Admin Panel</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>❌ Error</h1>
+        <nav>
+          <a href="/admin">← Dashboard</a>
+          <a href="/admin/tables">Tablas</a>
+        </nav>
+      </header>
+
+      <main>
+        <div class="error-container">
+          <div class="error-icon">🚫</div>
+          <h2>Oops! Algo salió mal</h2>
+          <div class="error-message"><%= error %></div>
+          <div class="error-actions">
+            <a href="/admin" class="btn">🏠 Ir al Dashboard</a>
+            <a href="/admin/tables" class="btn btn-secondary">📊 Ver Tablas</a>
+            <button onclick="history.back()" class="btn btn-warning">
+              ← Volver Atrás
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <style>
+      .error-container {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .error-icon {
+        font-size: 5rem;
+        margin-bottom: 20px;
+      }
+
+      .error-container h2 {
+        color: #4a5568;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+      }
+
+      .error-message {
+        background: #fed7d7;
+        color: #742a2a;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border: 1px solid #fc8181;
+        font-family: "Courier New", monospace;
+        text-align: left;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 30px;
+      }
+
+      @media (max-width: 768px) {
+        .error-actions {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .error-actions .btn {
+          width: 200px;
+        }
+      }
+    </style>
+  </body>
+</html>

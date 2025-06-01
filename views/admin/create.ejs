@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>➕ Crear en <%= tableName %></h1>
+        <nav>
+          <a href="/admin">Dashboard</a>
+          <a href="/admin/table/<%= tableName %>"
+            >← Volver a <%= tableName %></a
+          >
+          <a href="/admin/tables">Tablas</a>
+        </nav>
+      </header>
+
+      <main>
+        <!-- Mostrar errores -->
+        <script>
+          const urlParams = new URLSearchParams(window.location.search);
+          const error = urlParams.get("error");
+          if (error) {
+            document.write(
+              '<div class="alert alert-error">❌ Error: ' +
+                decodeURIComponent(error) +
+                "</div>"
+            );
+          }
+        </script>
+
+        <div class="form-container">
+          <div class="form-header">
+            <h2>📝 Nuevo Registro</h2>
+            <p>
+              Completa los campos para crear un nuevo registro en
+              <strong><%= tableName %></strong>
+            </p>
+          </div>
+
+          <form method="POST" action="/admin/table/<%= tableName %>/create">
+            <% if (tableName === 'usuarios') { %>
+            <!-- Formulario para USUARIOS -->
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                required
+                placeholder="Nombre"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="apellido">Apellido *</label>
+              <input
+                type="text"
+                id="apellido"
+                name="apellido"
+                required
+                placeholder="Apellido"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                placeholder="correo@ejemplo.com"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="rut">RUT *</label>
+              <input
+                type="text"
+                id="rut"
+                name="rut"
+                required
+                placeholder="12345678-9"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input
+                type="text"
+                id="telefono"
+                name="telefono"
+                placeholder="+56912345678"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Contraseña *</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                placeholder="Contraseña segura"
+              />
+            </div>
+
+            <% } else if (tableName === 'egresos') { %>
+            <!-- Formulario para EGRESOS -->
+            <div class="form-group">
+              <label for="nombre">Nombre del Egreso *</label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                required
+                placeholder="Nombre del egreso"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="categoria">Categoría *</label>
+              <select id="categoria" name="categoria" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="alimentacion">Alimentación</option>
+                <option value="transporte">Transporte</option>
+                <option value="entretenimiento">Entretenimiento</option>
+                <option value="salud">Salud</option>
+                <option value="educacion">Educación</option>
+                <option value="hogar">Hogar</option>
+                <option value="servicios">Servicios</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="monto_total">Monto Total *</label>
+              <input
+                type="number"
+                id="monto_total"
+                name="monto_total"
+                step="0.01"
+                required
+                placeholder="0.00"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="divisa">Divisa</label>
+              <select id="divisa" name="divisa">
+                <option value="CLP" selected>CLP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="fecha">Fecha *</label>
+              <input type="date" id="fecha" name="fecha" required />
+              <script>
+                document.getElementById("fecha").value = new Date()
+                  .toISOString()
+                  .split("T")[0];
+              </script>
+            </div>
+
+            <div class="form-group">
+              <label for="observaciones">Observaciones</label>
+              <textarea
+                id="observaciones"
+                name="observaciones"
+                rows="3"
+                placeholder="Observaciones del egreso"
+              ></textarea>
+            </div>
+
+            <% } else if (tableName === 'usuario_egresos') { %>
+            <!-- Formulario para USUARIO_EGRESOS -->
+            <div class="form-group">
+              <label for="id_usuario">Usuario *</label>
+              <select id="id_usuario" name="id_usuario" required>
+                <option value="">Selecciona un usuario</option>
+                <% if (relatedData && relatedData.usuarios) { %> <%
+                relatedData.usuarios.forEach(usuario => { %>
+                <option value="<%= usuario.id %>">
+                  <%= usuario.nombre %> <%= usuario.apellido %> (ID: <%=
+                  usuario.id %>)
+                </option>
+                <% }) %> <% } %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="id_egreso">Egreso *</label>
+              <select id="id_egreso" name="id_egreso" required>
+                <option value="">Selecciona un egreso</option>
+                <% if (relatedData && relatedData.egresos) { %> <%
+                relatedData.egresos.forEach(egreso => { %>
+                <option value="<%= egreso.id %>">
+                  <%= egreso.nombre %> (ID: <%= egreso.id %>)
+                </option>
+                <% }) %> <% } %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="rol">Rol *</label>
+              <select id="rol" name="rol" required>
+                <option value="">Selecciona un rol</option>
+                <option value="pagador">Pagador</option>
+                <option value="deudor">Deudor</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="estado_pago">Estado de Pago</label>
+              <select id="estado_pago" name="estado_pago">
+                <option value="pendiente" selected>Pendiente</option>
+                <option value="pagado">Pagado</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="monto_pagado">Monto Pagado *</label>
+              <input
+                type="number"
+                id="monto_pagado"
+                name="monto_pagado"
+                step="0.01"
+                required
+                placeholder="0.00"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="fecha_pago">Fecha de Pago</label>
+              <input type="date" id="fecha_pago" name="fecha_pago" />
+            </div>
+
+            <div class="form-group">
+              <label for="forma_pago">Forma de Pago *</label>
+              <select id="forma_pago" name="forma_pago" required>
+                <option value="">Selecciona forma de pago</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                <option value="tarjeta_debito">Tarjeta de Débito</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="entidad_pago">Entidad de Pago</label>
+              <input
+                type="text"
+                id="entidad_pago"
+                name="entidad_pago"
+                placeholder="Ej: Banco Chile, Visa, etc."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="divisa">Divisa</label>
+              <select id="divisa" name="divisa">
+                <option value="CLP" selected>CLP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+            <% } %>
+
+            <div class="form-actions">
+              <a href="/admin/table/<%= tableName %>" class="btn btn-secondary"
+                >Cancelar</a
+              >
+              <button type="submit" class="btn btn-success">
+                ✅ Crear Registro
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <style>
+      .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      .form-header h2 {
+        color: #4a5568;
+        margin-bottom: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.95rem;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        background: white;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .btn-secondary {
+        background: #718096;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #4a5568;
+      }
+
+      @media (max-width: 768px) {
+        .form-actions {
+          flex-direction: column;
+        }
+
+        .form-actions .btn {
+          width: 100%;
+          margin: 5px 0;
+        }
+      }
+    </style>
+  </body>
+</html>

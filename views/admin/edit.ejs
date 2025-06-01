@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✏️ Editar <%= tableName %> #<%= record.id %></h1>
+            <nav>
+                <a href="/admin">Dashboard</a>
+                <a href="/admin/table/<%= tableName %>">← Volver a <%= tableName %></a>
+                <a href="/admin/tables">Tablas</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Mostrar errores -->
+            <script>
+                const urlParams = new URLSearchParams(window.location.search);
+                const error = urlParams.get('error');
+                if (error) {
+                    document.write('<div class="alert alert-error">❌ Error: ' + decodeURIComponent(error) + '</div>');
+                }
+            </script>
+
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>✏️ Editar Registro</h2>
+                    <p>Modifica los campos del registro <strong>#<%= record.id %></strong> en <strong><%= tableName %></strong></p>
+                    
+                    <!-- Mostrar información del registro -->
+                    <% if (record.created_at) { %>
+                        <div class="record-info">
+                            <small>
+                                Creado: <%= new Date(record.created_at).toLocaleString('es-CL') %>
+                                <% if (record.updated_at && record.updated_at !== record.created_at) { %>
+                                    • Actualizado: <%= new Date(record.updated_at).toLocaleString('es-CL') %>
+                                <% } %>
+                            </small>
+                        </div>
+                    <% } %>
+                </div>
+
+                <form method="POST" action="/admin/table/<%= tableName %>/edit/<%= record.id %>">
+                    
+                    <% if (tableName === 'usuarios') { %>
+                        <!-- Formulario para USUARIOS -->
+                        <div class="form-group">
+                            <label for="nombre">Nombre *</label>
+                            <input type="text" id="nombre" name="nombre" required value="<%= record.nombre || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apellido">Apellido *</label>
+                            <input type="text" id="apellido" name="apellido" required value="<%= record.apellido || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required value="<%= record.email || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rut">RUT *</label>
+                            <input type="text" id="rut" name="rut" required value="<%= record.rut || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="text" id="telefono" name="telefono" value="<%= record.telefono || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Nueva Contraseña</label>
+                            <input type="password" id="password" name="password" placeholder="Dejar vacío para mantener la actual">
+                            <small class="field-info">Dejar vacío para no cambiar la contraseña</small>
+                        </div>
+
+                    <% } else if (tableName === 'egresos') { %>
+                        <!-- Formulario para EGRESOS -->
+                        <div class="form-group">
+                            <label for="nombre">Nombre del Egreso *</label>
+                            <input type="text" id="nombre" name="nombre" required value="<%= record.nombre || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="categoria">Categoría *</label>
+                            <select id="categoria" name="categoria" required>
+                                <option value="alimentacion" <%= record.categoria === 'alimentacion' ? 'selected' : '' %>>Alimentación</option>
+                                <option value="transporte" <%= record.categoria === 'transporte' ? 'selected' : '' %>>Transporte</option>
+                                <option value="entretenimiento" <%= record.categoria === 'entretenimiento' ? 'selected' : '' %>>Entretenimiento</option>
+                                <option value="salud" <%= record.categoria === 'salud' ? 'selected' : '' %>>Salud</option>
+                                <option value="educacion" <%= record.categoria === 'educacion' ? 'selected' : '' %>>Educación</option>
+                                <option value="hogar" <%= record.categoria === 'hogar' ? 'selected' : '' %>>Hogar</option>
+                                <option value="servicios" <%= record.categoria === 'servicios' ? 'selected' : '' %>>Servicios</option>
+                                <option value="otros" <%= record.categoria === 'otros' ? 'selected' : '' %>>Otros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monto_total">Monto Total *</label>
+                            <input type="number" id="monto_total" name="monto_total" step="0.01" required value="<%= record.monto_total || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="divisa">Divisa</label>
+                            <select id="divisa" name="divisa">
+                                <option value="CLP" <%= record.divisa === 'CLP' ? 'selected' : '' %>>CLP</option>
+                                <option value="USD" <%= record.divisa === 'USD' ? 'selected' : '' %>>USD</option>
+                                <option value="EUR" <%= record.divisa === 'EUR' ? 'selected' : '' %>>EUR</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha">Fecha *</label>
+                            <input type="date" id="fecha" name="fecha" required 
+                                   value="<%= record.fecha ? new Date(record.fecha).toISOString().split('T')[0] : '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea id="observaciones" name="observaciones" rows="3"><%= record.observaciones || '' %></textarea>
+                        </div>
+
+                    <% } else if (tableName === 'usuario_egresos') { %>
+                        <!-- Formulario para USUARIO_EGRESOS -->
+                        <div class="form-group">
+                            <label for="id_usuario">Usuario *</label>
+                            <select id="id_usuario" name="id_usuario" required>
+                                <% if (relatedData && relatedData.usuarios) { %>
+                                    <% relatedData.usuarios.forEach(usuario => { %>
+                                        <option value="<%= usuario.id %>" <%= record.id_usuario == usuario.id ? 'selected' : '' %>>
+                                            <%= usuario.nombre %> <%= usuario.apellido %> (ID: <%= usuario.id %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_egreso">Egreso *</label>
+                            <select id="id_egreso" name="id_egreso" required>
+                                <% if (relatedData && relatedData.egresos) { %>
+                                    <% relatedData.egresos.forEach(egreso => { %>
+                                        <option value="<%= egreso.id %>" <%= record.id_egreso == egreso.id ? 'selected' : '' %>>
+                                            <%= egreso.nombre %> (ID: <%= egreso.id %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rol">Rol *</label>
+                            <select id="rol" name="rol" required>
+                                <option value="pagador" <%= record.rol === 'pagador' ? 'selected' : '' %>>Pagador</option>
+                                <option value="deudor" <%= record.rol === 'deudor' ? 'selected' : '' %>>Deudor</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado_pago">Estado de Pago</label>
+                            <select id="estado_pago" name="estado_pago">
+                                <option value="pendiente" <%= record.estado_pago === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
+                                <option value="pagado" <%= record.estado_pago === 'pagado' ? 'selected' : '' %>>Pagado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monto_pagado">Monto Pagado *</label>
+                            <input type="number" id="monto_pagado" name="monto_pagado" step="0.01" required value="<%= record.monto_pagado || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha_pago">Fecha de Pago</label>
+                            <input type="date" id="fecha_pago" name="fecha_pago" 
+                                   value="<%= record.fecha_pago ? new Date(record.fecha_pago).toISOString().split('T')[0] : '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="forma_pago">Forma de Pago *</label>
+                            <select id="forma_pago" name="forma_pago" required>
+                                <option value="efectivo" <%= record.forma_pago === 'efectivo' ? 'selected' : '' %>>Efectivo</option>
+                                <option value="transferencia" <%= record.forma_pago === 'transferencia' ? 'selected' : '' %>>Transferencia</option>
+                                <option value="tarjeta_credito" <%= record.forma_pago === 'tarjeta_credito' ? 'selected' : '' %>>Tarjeta de Crédito</option>
+                                <option value="tarjeta_debito" <%= record.forma_pago === 'tarjeta_debito' ? 'selected' : '' %>>Tarjeta de Débito</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="entidad_pago">Entidad de Pago</label>
+                            <input type="text" id="entidad_pago" name="entidad_pago" value="<%= record.entidad_pago || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="divisa">Divisa</label>
+                            <select id="divisa" name="divisa">
+                                <option value="CLP" <%= record.divisa === 'CLP' ? 'selected' : '' %>>CLP</option>
+                                <option value="USD" <%= record.divisa === 'USD' ? 'selected' : '' %>>USD</option>
+                                <option value="EUR" <%= record.divisa === 'EUR' ? 'selected' : '' %>>EUR</option>
+                            </select>
+                        </div>
+                    <% } %>
+
+                    <div class="form-actions">
+                        <a href="/admin/table/<%= tableName %>" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-warning">💾 Actualizar</button>
+                        <button type="button" onclick="deleteRecord()" class="btn btn-danger">🗑️ Eliminar</button>
+                    </div>
+                </form>
+
+                <!-- Formulario oculto para eliminar -->
+                <form id="deleteForm" method="POST" action="/admin/table/<%= tableName %>/delete/<%= record.id %>" style="display: none;"></form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function deleteRecord() {
+            if (confirm('¿Estás seguro de que quieres eliminar este registro?\n\nEsta acción no se puede deshacer.')) {
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
+
+    <style>
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .record-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .field-info {
+            display: block;
+            margin-top: 5px;
+            color: #718096;
+            font-size: 0.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+    </style>
+</body>
+</html>

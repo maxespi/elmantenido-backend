@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🎛️ Admin Panel - ElMantenido</h1>
+        <nav>
+          <a href="/admin">Dashboard</a>
+          <a href="/admin/tables">Tablas</a>
+          <a href="/api/health" target="_blank">API Health</a>
+        </nav>
+      </header>
+
+      <main>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+              <h3><%= stats.usuarios %></h3>
+              <p>Usuarios</p>
+            </div>
+            <a href="/admin/table/usuarios" class="stat-link">Ver →</a>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <h3><%= stats.egresos %></h3>
+              <p>Egresos</p>
+            </div>
+            <a href="/admin/table/egresos" class="stat-link">Ver →</a>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">🔗</div>
+            <div class="stat-info">
+              <h3><%= stats.relaciones %></h3>
+              <p>Relaciones</p>
+            </div>
+            <a href="/admin/table/usuario_egresos" class="stat-link">Ver →</a>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">💵</div>
+            <div class="stat-info">
+              <h3>
+                $<%= new Intl.NumberFormat('es-CL').format(stats.totalMonto) %>
+              </h3>
+              <p>Total Montos</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <h2>🚀 Acciones Rápidas</h2>
+
+          <div class="actions-grid">
+            <a href="/admin/table/usuarios/create" class="action-btn">
+              <span>👤</span>
+              Crear Usuario
+            </a>
+            <a href="/admin/users" class="action-btn">
+              <span>👥</span>
+              Gestionar Usuarios
+            </a>
+            <a href="/admin/table/egresos/create" class="action-btn">
+              <span>💰</span>
+              Crear Egreso
+            </a>
+            <a href="/admin/table/usuario_egresos/create" class="action-btn">
+              <span>🔗</span>
+              Crear Relación
+            </a>
+            <a href="/admin/tables" class="action-btn">
+              <span>📊</span>
+              Ver Todas las Tablas
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

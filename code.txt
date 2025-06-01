@@ -1,0 +1,43 @@
+# 1. Instalar dependencias
+npm install
+
+# 2. Verificar conexión MySQL
+npm run check-connection
+
+# 3. Configurar base de datos automáticamente
+npm run setup
+
+# 4. Iniciar servidor
+npm run dev
+
+
+
+Uso diario:
+bash# Solo iniciar (auto-configura si es necesario)
+npm run dev
+Si necesitas resetear todo:
+bashnpm run reset-db
+
+INICIALIZAR GIT HUB
+Para inicializar un proyecto en GitHub, puedes seguir estos pasos. Te doy la guía desde cero, suponiendo que tienes tu proyecto en una carpeta local y que ya tienes una cuenta en GitHub.
+
+✅ Paso 1: Crea un nuevo repositorio en GitHub
+Ve a https://github.com e inicia sesión.
+Haz clic en el botón + en la esquina superior derecha → New repository.
+Ponle un nombre (por ejemplo: mi-proyecto), agrega descripción si quieres.
+No marques la opción de inicializar con README, .gitignore ni licencia si ya tienes el proyecto en local.
+Haz clic en Create repository.
+✅ Paso 2: Abre tu terminal y navega a tu proyecto local
+cd ruta/de/tu/proyecto
+✅ Paso 3: Inicializa el repositorio Git
+git init
+✅ Paso 4: Añade todos los archivos y haz el primer commit
+git add .
+git commit -m "Primer commit"
+✅ Paso 5: Conecta tu repositorio local con el repositorio remoto de GitHub
+Copia la URL del repositorio que creaste (por ejemplo: https://github.com/usuario/mi-proyecto.git).
+git remote add origin https://github.com/usuario/mi-proyecto.git
+✅ Paso 6: Sube tu código al repositorio
+git branch -M main
+git push -u origin main
+⚠️ Si usas autenticación por token (recomendado), GitHub te pedirá usuario y luego el token en vez de la contraseña.
