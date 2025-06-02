@@ -37,22 +37,68 @@
             <a href="/admin/table/egresos" class="stat-link">Ver →</a>
           </div>
 
+          <!-- NUEVO: Tarjeta de Ingresos -->
+          <div class="stat-card">
+            <div class="stat-icon">💵</div>
+            <div class="stat-info">
+              <h3><%= stats.ingresos || 0 %></h3>
+              <p>Ingresos</p>
+            </div>
+            <a href="/admin/table/ingresos" class="stat-link">Ver →</a>
+          </div>
+
           <div class="stat-card">
             <div class="stat-icon">🔗</div>
             <div class="stat-info">
               <h3><%= stats.relaciones %></h3>
-              <p>Relaciones</p>
+              <p>Relaciones Egresos</p>
             </div>
             <a href="/admin/table/usuario_egresos" class="stat-link">Ver →</a>
           </div>
 
+          <!-- NUEVO: Tarjeta de Relaciones Ingresos -->
           <div class="stat-card">
-            <div class="stat-icon">💵</div>
+            <div class="stat-icon">🔗</div>
+            <div class="stat-info">
+              <h3><%= stats.relacionesIngresos || 0 %></h3>
+              <p>Relaciones Ingresos</p>
+            </div>
+            <a href="/admin/table/usuario_ingresos" class="stat-link">Ver →</a>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">💸</div>
             <div class="stat-info">
               <h3>
                 $<%= new Intl.NumberFormat('es-CL').format(stats.totalMonto) %>
               </h3>
-              <p>Total Montos</p>
+              <p>Total Egresos</p>
+            </div>
+          </div>
+
+          <!-- NUEVO: Total Ingresos -->
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <h3>
+                $<%= new Intl.NumberFormat('es-CL').format(stats.totalIngresos
+                || 0) %>
+              </h3>
+              <p>Total Ingresos</p>
+            </div>
+          </div>
+
+          <!-- NUEVO: Balance Neto -->
+          <div class="stat-card">
+            <div class="stat-icon">⚖️</div>
+            <div class="stat-info">
+              <h3
+                style="color: <%= (stats.totalIngresos || 0) - stats.totalMonto >= 0 ? '#48bb78' : '#ed8936' %>"
+              >
+                $<%= new Intl.NumberFormat('es-CL').format((stats.totalIngresos
+                || 0) - stats.totalMonto) %>
+              </h3>
+              <p>Balance Neto</p>
             </div>
           </div>
         </div>
@@ -70,12 +116,22 @@
               Gestionar Usuarios
             </a>
             <a href="/admin/table/egresos/create" class="action-btn">
-              <span>💰</span>
+              <span>💸</span>
               Crear Egreso
+            </a>
+            <!-- NUEVO: Crear Ingreso -->
+            <a href="/admin/table/ingresos/create" class="action-btn">
+              <span>💰</span>
+              Crear Ingreso
             </a>
             <a href="/admin/table/usuario_egresos/create" class="action-btn">
               <span>🔗</span>
-              Crear Relación
+              Crear Relación Egreso
+            </a>
+            <!-- NUEVO: Crear Relación Ingreso -->
+            <a href="/admin/table/usuario_ingresos/create" class="action-btn">
+              <span>🔗</span>
+              Crear Relación Ingreso
             </a>
             <a href="/admin/tables" class="action-btn">
               <span>📊</span>
@@ -83,7 +139,118 @@
             </a>
           </div>
         </div>
+
+        <!-- NUEVA SECCIÓN: Resumen Financiero -->
+        <div class="financial-summary">
+          <h2>📊 Resumen Financiero</h2>
+          <div class="summary-cards">
+            <div class="summary-card positive">
+              <h3>Total Ingresos</h3>
+              <p>
+                $<%= new Intl.NumberFormat('es-CL').format(stats.totalIngresos
+                || 0) %>
+              </p>
+              <small><%= stats.ingresos || 0 %> registros</small>
+            </div>
+            <div class="summary-card negative">
+              <h3>Total Egresos</h3>
+              <p>
+                $<%= new Intl.NumberFormat('es-CL').format(stats.totalMonto) %>
+              </p>
+              <small><%= stats.egresos %> registros</small>
+            </div>
+            <div
+              class="summary-card <%= (stats.totalIngresos || 0) - stats.totalMonto >= 0 ? 'positive' : 'negative' %>"
+            >
+              <h3>Balance</h3>
+              <p>
+                $<%= new Intl.NumberFormat('es-CL').format((stats.totalIngresos
+                || 0) - stats.totalMonto) %>
+              </p>
+              <small
+                ><%= (stats.totalIngresos || 0) - stats.totalMonto >= 0 ?
+                'Positivo' : 'Negativo' %></small
+              >
+            </div>
+          </div>
+        </div>
       </main>
     </div>
+
+    <style>
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+
+      .financial-summary {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-top: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .financial-summary h2 {
+        margin-bottom: 20px;
+        color: #4a5568;
+      }
+
+      .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .summary-card {
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        color: white;
+      }
+
+      .summary-card.positive {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+      }
+
+      .summary-card.negative {
+        background: linear-gradient(135deg, #ed8936, #dd6b20);
+      }
+
+      .summary-card h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .summary-card p {
+        margin: 0 0 5px 0;
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+
+      .summary-card small {
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .summary-cards {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </body>
 </html>

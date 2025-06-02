@@ -243,6 +243,85 @@
           <% } %>
         </div>
 
+        <!-- AGREGAR DESPUÉS DE LA SECCIÓN DE EGRESOS (antes del resumen en tabla) -->
+
+        <!-- Sección de Ingresos -->
+        <div class="section-container">
+          <h3>
+            💰 Ingresos del Usuario (<%= (usuario.ingresos &&
+            usuario.ingresos.length) || 0 %>)
+          </h3>
+          <% if (usuario.ingresos && usuario.ingresos.length > 0) { %>
+          <div class="relations-grid">
+            <% usuario.ingresos.forEach(function(relacion) { %>
+            <div class="relation-card ingreso">
+              <div class="relation-header">
+                <h4><%= relacion.ingreso.nombre %></h4>
+                <span class="role-badge ingreso">INGRESO</span>
+                <% if (relacion.ingreso.es_recurrente) { %>
+                <span class="status-badge recurrente">🔄 RECURRENTE</span>
+                <% } %>
+              </div>
+
+              <div class="relation-details">
+                <p>
+                  <strong>📅 Fecha Recibo:</strong> <%= new
+                  Date(relacion.fecha_recibo).toLocaleDateString('es-CL') %>
+                </p>
+                <p>
+                  <strong>🏷️ Categoría:</strong> <%= relacion.ingreso.categoria
+                  %>
+                </p>
+                <p>
+                  <strong>💰 Monto Recibido:</strong> $<%= new
+                  Intl.NumberFormat('es-CL').format(relacion.monto_recibido) %>
+                </p>
+                <p>
+                  <strong>💱 Divisa:</strong> <%= relacion.ingreso.divisa %>
+                </p>
+                <% if (relacion.comentarios) { %>
+                <p>
+                  <strong>💬 Comentarios:</strong> <%= relacion.comentarios %>
+                </p>
+                <% } %>
+              </div>
+
+              <% if (relacion.ingreso.observaciones) { %>
+              <div class="relation-notes">
+                <p>
+                  <strong>📝 Observaciones:</strong> <%=
+                  relacion.ingreso.observaciones %>
+                </p>
+              </div>
+              <% } %>
+
+              <div class="relation-actions">
+                <a
+                  href="/admin/table/ingresos/edit/<%= relacion.ingreso.id %>"
+                  class="btn btn-sm btn-success"
+                >
+                  ✏️ Editar Ingreso
+                </a>
+                <a
+                  href="/admin/table/usuario_ingresos/edit/<%= relacion.id %>"
+                  class="btn btn-sm btn-primary"
+                >
+                  🔗 Editar Relación
+                </a>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+          <% } else { %>
+          <div class="empty-section">
+            <p>Este usuario no tiene ingresos registrados.</p>
+            <a href="/admin/table/ingresos/create" class="btn btn-primary">
+              ➕ Crear Primer Ingreso
+            </a>
+          </div>
+          <% } %>
+        </div>
+
         <!-- Resumen en Tabla -->
         <div class="section-container">
           <h3>📋 Resumen de Todas las Relaciones</h3>
@@ -577,6 +656,28 @@
         .relation-card {
           padding: 15px;
         }
+      }
+
+      .relation-card.ingreso {
+        border-left: 4px solid #48bb78;
+      }
+
+      .role-badge.ingreso {
+        background: #48bb78;
+      }
+
+      .status-badge.recurrente {
+        background: #667eea;
+      }
+
+      .btn.btn-success {
+        background-color: #48bb78;
+        color: white;
+        border: none;
+      }
+
+      .btn.btn-success:hover {
+        background-color: #38a169;
       }
     </style>
   </body>

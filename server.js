@@ -24,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/usuarios', require('./routes/usuarios'));
 app.use('/api/egresos', require('./routes/egresos'));
+app.use('/api/ingresos', require('./routes/ingresos'));
 
 // Routes Admin Panel
 app.use('/admin', require('./routes/admin'));
@@ -75,7 +76,7 @@ async function syncDatabase() {
         // Sincronizar modelos (crear tablas si no existen)
         await sequelize.sync({
             force: false, // No eliminar tablas existentes
-            alter: true   // Actualizar estructura si hay cambios
+            alter: false   // Actualizar estructura si hay cambios
         });
         console.log('✅ All models synchronized successfully.');
 

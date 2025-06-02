@@ -2,16 +2,16 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class Egreso extends Model {
+    class Ingreso extends Model {
         static associate(models) {
-            Egreso.hasMany(models.UsuarioEgreso, {
-                foreignKey: 'id_egreso',
-                as: 'participantes'
+            Ingreso.hasMany(models.UsuarioIngreso, {
+                foreignKey: 'id_ingreso',
+                as: 'relaciones'
             });
         }
     }
 
-    Egreso.init({
+    Ingreso.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -23,29 +23,24 @@ module.exports = (sequelize, DataTypes) => {
         },
         categoria: {
             type: DataTypes.ENUM(
-                'restaurante',
-                'compra',
-                'cuenta',
-                'transporte',
-                'entretenimiento',
-                'salud',
-                'educacion',
-                'hogar',
+                'sueldo',
+                'freelance',
+                'bonificacion',
+                'inversion',
+                'venta',
+                'prestamo',
+                'regalo',
                 'otro'
             ),
-            allowNull: false
-        },
-        monto_total: {
-            type: DataTypes.DECIMAL(10, 2),
             allowNull: false
         },
         divisa: {
             type: DataTypes.ENUM('CLP', 'USD', 'EUR'),
             defaultValue: 'CLP'
         },
-        fecha: {
-            type: DataTypes.DATEONLY,
-            allowNull: false
+        es_recurrente: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         },
         observaciones: {
             type: DataTypes.TEXT,
@@ -53,12 +48,12 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
-        modelName: 'Egreso',
-        tableName: 'egresos',
+        modelName: 'Ingreso',
+        tableName: 'ingresos',
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at'
     });
 
-    return Egreso;
+    return Ingreso;
 };

@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'id_usuario',
                 as: 'egresos'
             });
+
+            Usuario.hasMany(models.UsuarioIngreso, {
+                foreignKey: 'id_usuario',
+                as: 'ingresos'
+            });
         }
     }
 
@@ -52,7 +57,8 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'usuarios',
         timestamps: true,
         createdAt: 'created_at',
-        updatedAt: 'updated_at'
+        updatedAt: 'updated_at',
+        sync: false
     });
 
     return Usuario;

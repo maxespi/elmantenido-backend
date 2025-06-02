@@ -127,14 +127,15 @@
               <label for="categoria">Categoría *</label>
               <select id="categoria" name="categoria" required>
                 <option value="">Selecciona una categoría</option>
-                <option value="alimentacion">Alimentación</option>
+                <option value="restaurante">Restaurante</option>
+                <option value="compra">Compra</option>
+                <option value="cuenta">Cuenta</option>
                 <option value="transporte">Transporte</option>
                 <option value="entretenimiento">Entretenimiento</option>
                 <option value="salud">Salud</option>
                 <option value="educacion">Educación</option>
                 <option value="hogar">Hogar</option>
-                <option value="servicios">Servicios</option>
-                <option value="otros">Otros</option>
+                <option value="otro">Otro</option>
               </select>
             </div>
 
@@ -176,6 +177,127 @@
                 name="observaciones"
                 rows="3"
                 placeholder="Observaciones del egreso"
+              ></textarea>
+            </div>
+
+            <% } else if (tableName === 'ingresos') { %>
+            <!-- Formulario para INGRESOS -->
+            <div class="form-group">
+              <label for="nombre">Nombre del Ingreso *</label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                required
+                placeholder="Nombre del ingreso"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="categoria">Categoría *</label>
+              <select id="categoria" name="categoria" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="sueldo">Sueldo</option>
+                <option value="freelance">Freelance</option>
+                <option value="bonificacion">Bonificación</option>
+                <option value="inversion">Inversión</option>
+                <option value="venta">Venta</option>
+                <option value="prestamo">Préstamo</option>
+                <option value="regalo">Regalo</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="divisa">Divisa</label>
+              <select id="divisa" name="divisa">
+                <option value="CLP" selected>CLP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="es_recurrente">¿Es Recurrente?</label>
+              <select id="es_recurrente" name="es_recurrente">
+                <option value="false" selected>No</option>
+                <option value="true">Sí</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="observaciones">Observaciones</label>
+              <textarea
+                id="observaciones"
+                name="observaciones"
+                rows="3"
+                placeholder="Observaciones del ingreso"
+              ></textarea>
+            </div>
+
+            <% } else if (tableName === 'usuario_ingresos') { %>
+            <!-- Formulario para USUARIO_INGRESOS -->
+            <div class="form-group">
+              <label for="id_usuario">Usuario *</label>
+              <select id="id_usuario" name="id_usuario" required>
+                <option value="">Selecciona un usuario</option>
+                <% if (relatedData && relatedData.usuarios) { %> <%
+                relatedData.usuarios.forEach(usuario => { %>
+                <option value="<%= usuario.id %>">
+                  <%= usuario.nombre %> <%= usuario.apellido %> (ID: <%=
+                  usuario.id %>)
+                </option>
+                <% }) %> <% } %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="id_ingreso">Ingreso *</label>
+              <select id="id_ingreso" name="id_ingreso" required>
+                <option value="">Selecciona un ingreso</option>
+                <% if (relatedData && relatedData.ingresos) { %> <%
+                relatedData.ingresos.forEach(ingreso => { %>
+                <option value="<%= ingreso.id %>">
+                  <%= ingreso.nombre %> (ID: <%= ingreso.id %>)
+                </option>
+                <% }) %> <% } %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="monto_recibido">Monto Recibido *</label>
+              <input
+                type="number"
+                id="monto_recibido"
+                name="monto_recibido"
+                step="0.01"
+                required
+                placeholder="0.00"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="fecha_recibo">Fecha de Recibo *</label>
+              <input
+                type="date"
+                id="fecha_recibo"
+                name="fecha_recibo"
+                required
+              />
+              <script>
+                document.getElementById("fecha_recibo").value = new Date()
+                  .toISOString()
+                  .split("T")[0];
+              </script>
+            </div>
+
+            <div class="form-group">
+              <label for="comentarios">Comentarios</label>
+              <textarea
+                id="comentarios"
+                name="comentarios"
+                rows="3"
+                placeholder="Comentarios sobre el ingreso"
               ></textarea>
             </div>
 

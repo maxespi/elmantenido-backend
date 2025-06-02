@@ -5,12 +5,27 @@ const router = express.Router();
 // Dashboard principal
 router.get('/', async (req, res) => {
     try {
+        // Importar modelos de ingresos si existen
+        const { Ingreso, UsuarioIngreso } = require('../models');
+
         const stats = {
             usuarios: await Usuario.count(),
             egresos: await Egreso.count(),
             relaciones: await UsuarioEgreso.count(),
             totalMonto: await UsuarioEgreso.sum('monto_pagado') || 0
         };
+
+        // Agregar estadísticas de ingresos si los modelos existen
+        try {
+            stats.ingresos = await Ingreso.count();
+            stats.relacionesIngresos = await UsuarioIngreso.count();
+            stats.totalIngresos = await UsuarioIngreso.sum('monto_recibido') || 0;
+        } catch (error) {
+            // Si los modelos de ingresos no existen, usar valores por defecto
+            stats.ingresos = 0;
+            stats.relacionesIngresos = 0;
+            stats.totalIngresos = 0;
+        }
 
         res.render('admin/dashboard', {
             title: 'Admin Dashboard',
@@ -26,7 +41,9 @@ router.get('/tables', (req, res) => {
     const tables = [
         { name: 'usuarios', displayName: 'Usuarios', icon: '👥' },
         { name: 'egresos', displayName: 'Egresos', icon: '💰' },
-        { name: 'usuario_egresos', displayName: 'Usuario-Egresos', icon: '🔗' }
+        { name: 'ingresos', displayName: 'Ingresos', icon: '💰' },
+        { name: 'usuario_egresos', displayName: 'Usuario-Egresos', icon: '🔗' },
+        { name: 'usuario_ingresos', displayName: 'Usuario-Ingresos', icon: '🔗' }
     ];
 
     res.render('admin/tables', {
@@ -64,6 +81,16 @@ router.get('/table/:tableName', async (req, res) => {
                 });
                 break;
 
+            case 'ingresos':
+                const { Ingreso } = require('../models');
+                model = Ingreso;
+                data = await Ingreso.findAndCountAll({
+                    limit,
+                    offset,
+                    order: [['created_at', 'DESC']]
+                });
+                break;
+
             case 'usuario_egresos':
                 model = UsuarioEgreso;
                 includeOptions = [
@@ -71,6 +98,21 @@ router.get('/table/:tableName', async (req, res) => {
                     { model: Egreso, as: 'egreso', attributes: ['nombre'] }
                 ];
                 data = await UsuarioEgreso.findAndCountAll({
+                    include: includeOptions,
+                    limit,
+                    offset,
+                    order: [['created_at', 'DESC']]
+                });
+                break;
+
+            case 'usuario_ingresos':
+                const { UsuarioIngreso } = require('../models');
+                model = UsuarioIngreso;
+                includeOptions = [
+                    { model: Usuario, as: 'usuario', attributes: ['nombre', 'apellido'] },
+                    { model: require('../models').Ingreso, as: 'ingreso', attributes: ['nombre'] }
+                ];
+                data = await UsuarioIngreso.findAndCountAll({
                     include: includeOptions,
                     limit,
                     offset,
@@ -120,6 +162,16 @@ router.get('/table/:tableName/create', async (req, res) => {
                 model = UsuarioEgreso;
                 relatedData.usuarios = await Usuario.findAll({ attributes: ['id', 'nombre', 'apellido'] });
                 relatedData.egresos = await Egreso.findAll({ attributes: ['id', 'nombre'] });
+                break;
+            case 'ingresos':
+                const { Ingreso } = require('../models');
+                model = Ingreso;
+                break;
+            case 'usuario_ingresos':
+                const { UsuarioIngreso } = require('../models');
+                model = UsuarioIngreso;
+                relatedData.usuarios = await Usuario.findAll({ attributes: ['id', 'nombre', 'apellido'] });
+                relatedData.ingresos = await require('../models').Ingreso.findAll({ attributes: ['id', 'nombre'] });
                 break;
             default:
                 return res.status(404).render('admin/error', { error: 'Tabla no encontrada' });
@@ -174,6 +226,28 @@ router.post('/table/:tableName/create', async (req, res) => {
                     req.body.id_egreso = parseInt(req.body.id_egreso);
                 }
                 break;
+            case 'ingresos':
+                const { Ingreso } = require('../models');
+                model = Ingreso;
+                // Convertir es_recurrente a boolean
+                if (req.body.es_recurrente !== undefined) {
+                    req.body.es_recurrente = req.body.es_recurrente === 'true';
+                }
+                break;
+            case 'usuario_ingresos':
+                const { UsuarioIngreso } = require('../models');
+                model = UsuarioIngreso;
+                // Convertir campos numéricos
+                if (req.body.monto_recibido) {
+                    req.body.monto_recibido = parseFloat(req.body.monto_recibido);
+                }
+                if (req.body.id_usuario) {
+                    req.body.id_usuario = parseInt(req.body.id_usuario);
+                }
+                if (req.body.id_ingreso) {
+                    req.body.id_ingreso = parseInt(req.body.id_ingreso);
+                }
+                break;
             default:
                 return res.status(404).json({ error: 'Tabla no encontrada' });
         }
@@ -217,6 +291,18 @@ router.get('/table/:tableName/edit/:id', async (req, res) => {
                 record = await UsuarioEgreso.findByPk(id);
                 relatedData.usuarios = await Usuario.findAll({ attributes: ['id', 'nombre', 'apellido'] });
                 relatedData.egresos = await Egreso.findAll({ attributes: ['id', 'nombre'] });
+                break;
+            case 'ingresos':
+                const { Ingreso } = require('../models');
+                model = Ingreso;
+                record = await Ingreso.findByPk(id);
+                break;
+            case 'usuario_ingresos':
+                const { UsuarioIngreso } = require('../models');
+                model = UsuarioIngreso;
+                record = await UsuarioIngreso.findByPk(id);
+                relatedData.usuarios = await Usuario.findAll({ attributes: ['id', 'nombre', 'apellido'] });
+                relatedData.ingresos = await require('../models').Ingreso.findAll({ attributes: ['id', 'nombre'] });
                 break;
             default:
                 return res.status(404).render('admin/error', { error: 'Tabla no encontrada' });
@@ -274,6 +360,26 @@ router.post('/table/:tableName/edit/:id', async (req, res) => {
                     req.body.id_egreso = parseInt(req.body.id_egreso);
                 }
                 break;
+            case 'ingresos':
+                const { Ingreso } = require('../models');
+                model = Ingreso;
+                if (req.body.es_recurrente !== undefined) {
+                    req.body.es_recurrente = req.body.es_recurrente === 'true';
+                }
+                break;
+            case 'usuario_ingresos':
+                const { UsuarioIngreso } = require('../models');
+                model = UsuarioIngreso;
+                if (req.body.monto_recibido) {
+                    req.body.monto_recibido = parseFloat(req.body.monto_recibido);
+                }
+                if (req.body.id_usuario) {
+                    req.body.id_usuario = parseInt(req.body.id_usuario);
+                }
+                if (req.body.id_ingreso) {
+                    req.body.id_ingreso = parseInt(req.body.id_ingreso);
+                }
+                break;
             default:
                 return res.status(404).json({ error: 'Tabla no encontrada' });
         }
@@ -315,6 +421,14 @@ router.post('/table/:tableName/delete/:id', async (req, res) => {
                 break;
             case 'usuario_egresos':
                 model = UsuarioEgreso;
+                break;
+            case 'ingresos':
+                const { Ingreso } = require('../models');
+                model = Ingreso;
+                break;
+            case 'usuario_ingresos':
+                const { UsuarioIngreso } = require('../models');
+                model = UsuarioIngreso;
                 break;
             default:
                 return res.status(404).json({ error: 'Tabla no encontrada' });
@@ -382,7 +496,7 @@ router.get('/user/:userId/details', async (req, res) => {
             });
         }
 
-        // Obtener todas las relaciones del usuario con egresos
+        // Obtener relaciones con egresos
         const relaciones = await UsuarioEgreso.findAll({
             where: { id_usuario: userId },
             include: [
@@ -395,7 +509,26 @@ router.get('/user/:userId/details', async (req, res) => {
             order: [['created_at', 'DESC']]
         });
 
-        // Separar por tipo de relación
+        // NUEVO: Obtener relaciones con ingresos
+        let ingresosRelaciones = [];
+        try {
+            const { UsuarioIngreso, Ingreso } = require('../models');
+            ingresosRelaciones = await UsuarioIngreso.findAll({
+                where: { id_usuario: userId },
+                include: [
+                    {
+                        model: Ingreso,
+                        as: 'ingreso',
+                        attributes: ['id', 'nombre', 'categoria', 'divisa', 'es_recurrente', 'observaciones']
+                    }
+                ],
+                order: [['created_at', 'DESC']]
+            });
+        } catch (error) {
+            console.log('Modelos de ingreso no disponibles');
+        }
+
+        // Separar por tipo de relación en egresos
         const comoPagedador = relaciones.filter(r => r.rol === 'pagador');
         const comoDeudor = relaciones.filter(r => r.rol === 'deudor');
 
@@ -407,12 +540,22 @@ router.get('/user/:userId/details', async (req, res) => {
             montoTotalPagado: comoPagedador.reduce((sum, r) => sum + parseFloat(r.monto_pagado || 0), 0),
             montoTotalDeuda: comoDeudor.reduce((sum, r) => sum + parseFloat(r.monto_pagado || 0), 0),
             deudasPendientes: comoDeudor.filter(r => r.estado_pago === 'pendiente').length,
-            deudasPagadas: comoDeudor.filter(r => r.estado_pago === 'pagado').length
+            deudasPagadas: comoDeudor.filter(r => r.estado_pago === 'pagado').length,
+            // NUEVO: Estadísticas de ingresos
+            totalIngresos: ingresosRelaciones.length,
+            montoTotalIngresos: ingresosRelaciones.reduce((sum, r) => sum + parseFloat(r.monto_recibido || 0), 0),
+            ingresosRecurrentes: ingresosRelaciones.filter(r => r.ingreso && r.ingreso.es_recurrente).length
+        };
+
+        // Agregar ingresos al objeto usuario
+        const usuarioCompleto = {
+            ...usuario.toJSON(),
+            ingresos: ingresosRelaciones
         };
 
         res.render('admin/user-details', {
             title: `Detalle de Usuario: ${usuario.nombre} ${usuario.apellido}`,
-            usuario: usuario.toJSON(),
+            usuario: usuarioCompleto,
             relaciones,
             comoPagedador,
             comoDeudor,

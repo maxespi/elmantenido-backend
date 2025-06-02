@@ -1,0 +1,45 @@
+Estructura de: C:\PROYECTOS\elmantenido\elmantenido-backend
+|- config
+  |- config.json
+|- middleware
+  |- auth.js
+|- migrations
+  |- XXXXXX-create-initial-tables.js
+|- models
+  |- Egreso.js
+  |- index.js
+  |- Ingreso.js
+  |- Usuario.js
+  |- UsuarioEgreso.js
+  |- UsuarioIngreso.js
+|- public
+  |- css
+    |- admin.css
+|- routes
+  |- admin.js
+  |- auth.js
+  |- egresos.js
+  |- ingresos.js
+  |- usuarios.js
+|- scripts
+  |- check-connection.js
+  |- reset-db.js
+  |- setup.js
+  |- test-create.js
+|- views
+  |- admin
+    |- create.ejs
+    |- dashboard.ejs
+    |- edit.ejs
+    |- error.ejs
+    |- table-view.ejs
+    |- tables.ejs
+    |- user-details.ejs
+    |- users-list.ejs
+|- .env
+|- code.txt
+|- estructura.ps1
+|- estructura.txt
+|- package-lock.json
+|- package.json
+|- server.js

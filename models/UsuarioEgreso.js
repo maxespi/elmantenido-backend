@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         estado_pago: {
-            type: DataTypes.ENUM('pendiente', 'pagado'),
+            type: DataTypes.ENUM('pendiente', 'confirmado_por_deudor', 'pagado'), // ✅ AGREGAR 'confirmado_por_deudor'
             defaultValue: 'pendiente'
         },
         monto_pagado: {
@@ -51,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         fecha_pago: {
+            type: DataTypes.DATEONLY,
+            allowNull: true
+        },
+        fecha_confirmacion_deudor: {  // ✅ NUEVO CAMPO
             type: DataTypes.DATEONLY,
             allowNull: true
         },

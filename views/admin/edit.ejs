@@ -90,14 +90,15 @@
                         <div class="form-group">
                             <label for="categoria">Categoría *</label>
                             <select id="categoria" name="categoria" required>
-                                <option value="alimentacion" <%= record.categoria === 'alimentacion' ? 'selected' : '' %>>Alimentación</option>
+                                <option value="restaurante" <%= record.categoria === 'restaurante' ? 'selected' : '' %>>Restaurante</option>
+                                <option value="compra" <%= record.categoria === 'compra' ? 'selected' : '' %>>Compra</option>
+                                <option value="cuenta" <%= record.categoria === 'cuenta' ? 'selected' : '' %>>Cuenta</option>
                                 <option value="transporte" <%= record.categoria === 'transporte' ? 'selected' : '' %>>Transporte</option>
                                 <option value="entretenimiento" <%= record.categoria === 'entretenimiento' ? 'selected' : '' %>>Entretenimiento</option>
                                 <option value="salud" <%= record.categoria === 'salud' ? 'selected' : '' %>>Salud</option>
                                 <option value="educacion" <%= record.categoria === 'educacion' ? 'selected' : '' %>>Educación</option>
                                 <option value="hogar" <%= record.categoria === 'hogar' ? 'selected' : '' %>>Hogar</option>
-                                <option value="servicios" <%= record.categoria === 'servicios' ? 'selected' : '' %>>Servicios</option>
-                                <option value="otros" <%= record.categoria === 'otros' ? 'selected' : '' %>>Otros</option>
+                                <option value="otro" <%= record.categoria === 'otro' ? 'selected' : '' %>>Otro</option>
                             </select>
                         </div>
 
@@ -124,6 +125,93 @@
                         <div class="form-group">
                             <label for="observaciones">Observaciones</label>
                             <textarea id="observaciones" name="observaciones" rows="3"><%= record.observaciones || '' %></textarea>
+                        </div>
+
+                    <% } else if (tableName === 'ingresos') { %>
+                        <!-- Formulario para INGRESOS -->
+                        <div class="form-group">
+                            <label for="nombre">Nombre del Ingreso *</label>
+                            <input type="text" id="nombre" name="nombre" required value="<%= record.nombre || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="categoria">Categoría *</label>
+                            <select id="categoria" name="categoria" required>
+                                <option value="sueldo" <%= record.categoria === 'sueldo' ? 'selected' : '' %>>Sueldo</option>
+                                <option value="freelance" <%= record.categoria === 'freelance' ? 'selected' : '' %>>Freelance</option>
+                                <option value="bonificacion" <%= record.categoria === 'bonificacion' ? 'selected' : '' %>>Bonificación</option>
+                                <option value="inversion" <%= record.categoria === 'inversion' ? 'selected' : '' %>>Inversión</option>
+                                <option value="venta" <%= record.categoria === 'venta' ? 'selected' : '' %>>Venta</option>
+                                <option value="prestamo" <%= record.categoria === 'prestamo' ? 'selected' : '' %>>Préstamo</option>
+                                <option value="regalo" <%= record.categoria === 'regalo' ? 'selected' : '' %>>Regalo</option>
+                                <option value="otro" <%= record.categoria === 'otro' ? 'selected' : '' %>>Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="divisa">Divisa</label>
+                            <select id="divisa" name="divisa">
+                                <option value="CLP" <%= record.divisa === 'CLP' ? 'selected' : '' %>>CLP</option>
+                                <option value="USD" <%= record.divisa === 'USD' ? 'selected' : '' %>>USD</option>
+                                <option value="EUR" <%= record.divisa === 'EUR' ? 'selected' : '' %>>EUR</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="es_recurrente">¿Es Recurrente?</label>
+                            <select id="es_recurrente" name="es_recurrente">
+                                <option value="false" <%= !record.es_recurrente ? 'selected' : '' %>>No</option>
+                                <option value="true" <%= record.es_recurrente ? 'selected' : '' %>>Sí</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea id="observaciones" name="observaciones" rows="3"><%= record.observaciones || '' %></textarea>
+                        </div>
+
+                    <% } else if (tableName === 'usuario_ingresos') { %>
+                        <!-- Formulario para USUARIO_INGRESOS -->
+                        <div class="form-group">
+                            <label for="id_usuario">Usuario *</label>
+                            <select id="id_usuario" name="id_usuario" required>
+                                <% if (relatedData && relatedData.usuarios) { %>
+                                    <% relatedData.usuarios.forEach(usuario => { %>
+                                        <option value="<%= usuario.id %>" <%= record.id_usuario == usuario.id ? 'selected' : '' %>>
+                                            <%= usuario.nombre %> <%= usuario.apellido %> (ID: <%= usuario.id %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_ingreso">Ingreso *</label>
+                            <select id="id_ingreso" name="id_ingreso" required>
+                                <% if (relatedData && relatedData.ingresos) { %>
+                                    <% relatedData.ingresos.forEach(ingreso => { %>
+                                        <option value="<%= ingreso.id %>" <%= record.id_ingreso == ingreso.id ? 'selected' : '' %>>
+                                            <%= ingreso.nombre %> (ID: <%= ingreso.id %>)
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="monto_recibido">Monto Recibido *</label>
+                            <input type="number" id="monto_recibido" name="monto_recibido" step="0.01" required value="<%= record.monto_recibido || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha_recibo">Fecha de Recibo *</label>
+                            <input type="date" id="fecha_recibo" name="fecha_recibo" required
+                                   value="<%= record.fecha_recibo ? new Date(record.fecha_recibo).toISOString().split('T')[0] : '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="comentarios">Comentarios</label>
+                            <textarea id="comentarios" name="comentarios" rows="3"><%= record.comentarios || '' %></textarea>
                         </div>
 
                     <% } else if (tableName === 'usuario_egresos') { %>

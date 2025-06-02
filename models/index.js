@@ -31,6 +31,7 @@ fs
     db[model.name] = model;
   });
 
+// Ejecutar las asociaciones definidas en cada modelo
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
