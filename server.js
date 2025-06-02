@@ -104,10 +104,19 @@ async function createInitialData() {
                 email: 'admin@gastos.com',
                 rut: '11111111-1',
                 telefono: '+56912345678',
-                password_hash: await bcrypt.hash('admin123', 10)
+                password_hash: await bcrypt.hash('123', 10)
             });
 
-            console.log('✅ Initial admin user created (admin@gastos.com / admin123)');
+            await Usuario.create({
+                nombre: 'Max',
+                apellido: 'Sistema',
+                email: 'max@gastos.com',
+                rut: '11111112-1',
+                telefono: '+56912345678',
+                password_hash: await bcrypt.hash('123', 10)
+            });
+
+            console.log('✅ Initial users created');
         }
     } catch (error) {
         console.error('❌ Error creating initial data:', error);
